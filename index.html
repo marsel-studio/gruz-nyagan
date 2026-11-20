@@ -80,6 +80,25 @@ section{padding:72px 0}
 .ul li{list-style:none;margin:0 0 12px;padding-left:30px;position:relative}
 .ul li::before{content:"✓";position:absolute;left:0;top:0;width:22px;height:22px;border-radius:6px;background:var(--y);color:#111;display:grid;place-items:center;font-weight:900;font-size:13px}
 .note{color:var(--muted);font-size:14px;margin-top:10px}
+/* цены и скидки */
+.px{width:100%;border-collapse:collapse;margin:6px 0 12px}
+.px th,.px td{border:1px solid var(--line);padding:12px 14px;text-align:left;font-size:15px}
+.px thead th{background:var(--bg2);font-family:"Russo One",Impact,sans-serif;font-weight:400;font-size:13px;text-transform:uppercase;color:var(--y)}
+.px tbody th{font-weight:800;white-space:nowrap}
+.px td{color:var(--text)}
+.px td b{color:var(--y)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.dcard{background:var(--bg2);border:1px solid rgba(255,196,0,.35);border-radius:18px;padding:18px}
+.dcard .pct{font:400 36px/1 "Russo One",Impact,sans-serif;color:var(--y);display:block;margin-bottom:6px}
+.dcard b{font:400 19px "Russo One",Impact,sans-serif;text-transform:uppercase;display:block;margin-bottom:4px}
+.dcard p{color:var(--muted);font-size:14px;margin-top:6px}
+.live{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:rgba(46,160,67,.14);border:1px solid rgba(74,222,128,.4);color:#8ee6ac;font-weight:800;font-size:14px;padding:10px 16px;border-radius:999px}
+/* парк машин */
+.fleet{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.fcar{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:16px;font-size:15px}
+.fcar b{display:block;font-weight:800;margin-bottom:4px}
+.fcar small{color:var(--muted)}
+@media (max-width:900px){.pgrid,.fleet{grid-template-columns:1fr}.px th,.px td{padding:9px 10px;font-size:14px}}
 .contacts{background:var(--bg2);border-top:1px solid var(--line)}
 .cbox{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .cc{background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:22px}
@@ -134,8 +153,9 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
         <span class="kick">Нягань · любой груз, любые расстояния</span>
         <h1>Грузоперевозки<span>Быстро. Надёжно. Вовремя.</span></h1>
         <p>Переезды, мебель и техника, стройматериалы, вывоз мусора. Оставьте заявку за минуту, и водитель перезвонит, даже если сейчас за рулём.</p>
-        <div class="facts"><div><b>🕐</b>Круглосуточно</div><div><b>⚡</b>Подача 15–30 мин</div><div><b>📦</b>Бережная погрузка</div><div><b>💰</b>от 1 500 ₽/час</div></div>
+        <div class="facts"><div><b>🕐</b>Круглосуточно</div><div><b>⚡</b>Подача 15–30 мин</div><div><b>📦</b>Бережная погрузка</div><div><b>💰</b>от 1 500 ₽/час</div><div><b>🚛</b>2 машины</div><div><b>🛡</b>Страховка груза</div></div>
         <div class="cta"><a class="btn" href="#order">Оставить заявку</a><a class="btn ghost" href="tel:+79224488887">+7 922 44-8888-7</a></div>
+        <div class="live">🟢 Сейчас свободна 1 машина из 2 — подача от 15 минут</div>
       </div>
       <div class="pic"><img src="img/truck.jpg" alt="Грузовик GRUZ expedition"></div>
     </div>
@@ -157,6 +177,7 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
             <div class="f"><label for="hours" id="hoursLbl">Примерно часов</label><select id="hours"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>8</option></select></div>
             <div class="f"><label for="movers">Грузчики</label><select id="movers"><option value="0">Не нужны</option><option value="1">1 грузчик</option><option value="2">2 грузчика</option></select></div>
           </div>
+          <div class="f"><label>Страховка груза</label><div class="chips" id="ins"><button class="chip on" data-v="0" type="button">Не нужна</button><button class="chip" data-v="1" type="button">🛡 Добавить, +300 ₽</button></div><small style="color:var(--muted);font-size:12px">Покрытие до 100 000 ₽, оформляется вместе с заказом. Частники страховку не дают вообще.</small></div>
           <div class="row2"><div class="f"><label for="floor">Этаж / лифт</label><input id="floor" placeholder="Например: 5 этаж, лифт есть"></div><div class="f"><label for="name">Имя *</label><input id="name" autocomplete="name"></div></div>
           <div class="f"><label for="phone">Телефон *</label><input id="phone" type="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__"></div>
           <div class="f"><label for="note">Комментарий</label><textarea id="note" rows="2" placeholder="Например: холодильник и диван, нужен подъём без лифта"></textarea></div>
@@ -170,9 +191,29 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
           <h3>Примерная цена</h3>
           <div class="pr"><span id="carLbl">Машина, 2 ч × 1 500 ₽</span><span id="pCar">3 000 ₽</span></div>
           <div class="pr" id="movRow" style="display:none"><span id="movLbl"></span><span id="pMov"></span></div>
+          <div class="pr" id="discRow" style="display:none"><span id="discLbl"></span><span id="pDisc" style="color:#7ee2a0"></span></div>
+          <div class="pr" id="insRow" style="display:none"><span>🛡 Страховка груза</span><span id="pIns"></span></div>
           <div class="big" id="pTotal">≈ 3 000 ₽</div>
           <p class="note" id="priceNote">Точную цену водитель скажет по телефону.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="prices">
+    <div class="wrap">
+      <div class="head"><h2>Цены <span>без сюрпризов</span></h2><p>Прайс открыт, как в таблице. Считаем до подачи машины и фиксируем: «по факту» дороже не станет.</p></div>
+      <table class="px">
+        <thead><tr><th>Тариф</th><th>Без грузчиков</th><th>+1 грузчик</th><th>+2 грузчика</th></tr></thead>
+        <tbody>
+          <tr><th>🏙 По Нягани</th><td><b>1 500 ₽/час</b> за машину</td><td>+1 000 ₽/час</td><td>+2 000 ₽/час</td></tr>
+          <tr><th>🛣 Межгород</th><td><b>40 ₽/км</b> в одну сторону, обратная дорога включена</td><td>+1 000 ₽/час за погрузку</td><td>+2 000 ₽/час за погрузку</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Минимальный заказ по городу — 1 час. Межгород — минимум 3 000 ₽. Дополнительно: страховка груза до 100 000 ₽ — +300 ₽ к заказу. <span class="ex">пример прайса</span></p>
+      <div class="pgrid">
+        <div class="dcard"><span class="pct">−20%</span><b>🌙 Ночь, 22:00–07:00</b><p>Ночью дорога пустая, а машине всё равно простаивать. Укажите ночное время подачи — скидка посчитается в заявке сама.</p></div>
+        <div class="dcard"><span class="pct">−15%</span><b>🕐 Дневной спад, 12:00–15:00</b><p>После обеденных разъездов машины свободны. Подача в это время дешевле, и скидка сразу видна в калькуляторе выше.</p></div>
       </div>
     </div>
   </section>
@@ -194,6 +235,23 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
           <li>Клиент получает сообщение, кто взял заказ и когда перезвонит.</li>
         </ul>
         <p class="note">Автоответ СМС работает на Android. На iPhone Apple такого не разрешает, там тот же эффект даёт виртуальный номер с автоответом у оператора.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="head"><h2>Компания, <span>а не частник</span></h2><p>Частник — лотерея: цена «по факту», может пропасть с вещами, а попутчиков подбирает прямо в вашу машину. У нас по-другому.</p></div>
+      <ul class="ul">
+        <li><b>Цена фиксируется до подачи.</b> Сказали 3 000 — значит 3 000, «по факту» дороже не станет.</li>
+        <li><b>В машине только ваш груз.</b> Мы не собираем попутные заказы: ваши вещи едут одни и не «случайно исчезают».</li>
+        <li><b>Ни один звонок не теряется.</b> Пропустили — вам сразу уходит СМС со ссылкой на заявку, перезваниваем в течение 10 минут.</li>
+        <li><b>Груз можно застраховать</b> — покрытие до 100 000 ₽ всего +300 ₽ к заказу.</li>
+        <li><b>Две машины — подстраховка друг друга.</b> Вещей оказалось больше или машина встала? Вторая подоспеет, заказ не сорвётся.</li>
+      </ul>
+      <div class="fleet">
+        <div class="fcar">🚚 <b>Газель-тент · 3 м · 1,5 т · 12 м³</b><small>Переезды, мебель, техника, стройматериалы. <span class="ex">пример парка</span></small></div>
+        <div class="fcar">🚛 <b>Газель-борт · 2,5 м · 1 т</b><small>Вывоз мусора, дрова, песок и стройматериал навалом. <span class="ex">пример парка</span></small></div>
       </div>
     </div>
   </section>
@@ -226,23 +284,40 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
 <script>
 const PRICE=1500, MOVER=1000; // ₽/час: машина и один грузчик — цены владельца
 const KM=40, INTER_MIN=3000;   // межгород: ₽/км в одну сторону (обратная дорога включена) и минимум — пример, уточнить у владельца
+const INS=300;                 // страховка груза, ₽ за заказ — пример, уточнить у владельца
+const NIGHT=[22,7], MIDDAY=[12,15]; // окна «свободных часов» и скидки — сверить с владельцем
+const NIGHT_PCT=20, MIDDAY_PCT=15;
 const rub=n=>n.toLocaleString('ru-RU')+' ₽';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const $=id=>document.getElementById(id);
 const pick=id=>$(id).querySelector('.chip.on').dataset.v;
-function est(){const inter=pick('trip')==='inter',h=+$('hours').value,mv=+$('movers').value,km=Math.max(0,+$('km').value||0);
-  const car=inter?(km?Math.max(INTER_MIN,km*KM):0):h*PRICE, mov=mv*h*MOVER;return {inter,h,mv,km,car,mov,total:car+mov}}
+function est(){const inter=pick('trip')==='inter',h=+$('hours').value,mv=+$('movers').value,km=Math.max(0,+$('km').value||0),ins=pick('ins')==='1'?INS:0;
+  const car0=inter?(km?Math.max(INTER_MIN,km*KM):0):h*PRICE,mov=mv*h*MOVER,pc=discPct(),car=car0?Math.round(car0*(100-pc)/100):0;
+  return {inter,h,mv,km,ins,pc,car0,car,mov,total:car+mov+ins}}
+// скидка за подачу в «свободные часы»: «Сейчас» — смотрим часы на телефоне клиента, иначе читаем время из поля
+function discPct(){let hr=null;
+  if(pick('when')==='Сейчас')hr=new Date().getHours();
+  else{const t=($('time').value||'').replace(/\d{1,2}\.\d{1,2}(\.\d{2,4})?/g,''),m=t.match(/(\d{1,2}):(\d{2})/),c=(t.replace(/\d{1,2}:\d{2}/,'').match(/\d+/g)||[]).map(Number);
+    hr=m?+m[1]:(c.find(x=>x<=23)??null)}
+  if(hr===null)return 0;
+  const[n1,n2]=NIGHT,[d1,d2]=MIDDAY;
+  if(hr>=n1||hr<n2)return NIGHT_PCT;
+  if(hr>=d1&&hr<d2)return MIDDAY_PCT;
+  return 0}
 function calc(){const e=est();
   $('hoursLbl').textContent=e.inter?'Погрузка и разгрузка, часов':'Примерно часов';
   $('kmBox').style.display=e.inter?'flex':'none';
   $('carLbl').textContent=e.inter?(e.km?`Машина, ${e.km} км × ${KM} ₽`:'Машина: укажите км'):`Машина, ${e.h} ч × ${rub(PRICE)}`;
-  $('pCar').textContent=e.car?rub(e.car):'—';
+  $('pCar').textContent=e.car0?rub(e.car0):'—';
   $('movRow').style.display=e.mv?'flex':'none';$('movLbl').textContent=`Грузчики, ${e.mv} × ${e.h} ч × ${rub(MOVER)}`;$('pMov').textContent=rub(e.mov);
-  $('pTotal').textContent=e.total?'≈ '+rub(e.total):'—';
-  $('priceNote').innerHTML=e.inter?`Межгород: ${KM} ₽/км в одну сторону, обратная дорога уже включена, минимум ${rub(INTER_MIN)} <span class="ex">пример</span>. Точную цену водитель скажет по телефону.`:'Точную цену водитель скажет по телефону.'}
+  $('discRow').style.display=e.pc&&e.car0?'flex':'none';$('discLbl').textContent=`🌙 Свободный час, −${e.pc}%`;$('pDisc').textContent='− '+rub(e.car0-e.car);
+  $('insRow').style.display=e.ins?'flex':'none';$('pIns').textContent='+ '+rub(e.ins);
+  $('pTotal').textContent=(e.car0||e.mov)?'≈ '+rub(e.total):'—';
+  $('priceNote').innerHTML=e.pc&&e.car0?'Скидка за подачу в свободный час — машина вам нужна, когда другим она простаивает. Точную цену водитель подтвердит по телефону.':(e.inter?`Межгород: ${KM} ₽/км в одну сторону, обратная дорога уже включена, минимум ${rub(INTER_MIN)} <span class="ex">пример</span>. Точную цену водитель скажет по телефону.`:'Точную цену водитель скажет по телефону.')}
 document.querySelectorAll('.chips').forEach(g=>g.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;g.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
-  if(g.id==='when')$('timeBox').style.display=c.dataset.v==='Сейчас'?'none':'flex';if(g.id==='trip')calc()}));
-['hours','movers'].forEach(id=>$(id).onchange=calc);$('km').oninput=calc;calc();
+  if(g.id==='when'){$('timeBox').style.display=c.dataset.v==='Сейчас'?'none':'flex';calc()}
+  if(g.id==='trip'||g.id==='ins')calc()}));
+['hours','movers'].forEach(id=>$(id).onchange=calc);$('km').oninput=calc;$('time').oninput=calc;calc();
 
 // ── подсказки адресов (OpenStreetMap/Photon) и маршрут (OSRM + виджет Яндекс Карт) ──
 // в рабочей версии — DaData или Геосаджест Яндекса с ключом заказчика
@@ -298,7 +373,7 @@ function addMsg(chat,html,kb,sys){const cb=document.querySelector(`#c-${chat} .c
   let k=null;if(kb){k=document.createElement('div');k.className='kb';k.innerHTML=kb;cb.appendChild(k)}cb.scrollTop=cb.scrollHeight;
   const t=document.querySelector(`.ftab[data-ft="${chat}"]`);if(t&&!t.classList.contains('on'))t.classList.add('ping');return m}
 const drop=chat=>document.querySelectorAll(`#c-${chat} .kb`).forEach(k=>k.remove());
-const card=o=>`🆕 <b>Заявка №${o.no}</b> · ${esc(o.when)}\n📍 <b>Откуда:</b> ${esc(o.from)}\n🏁 <b>Куда:</b> ${esc(o.to)}\n📦 ${esc(o.what)}${o.inter?' · 🛣 межгород '+o.km+' км':' · ~'+o.hours+' ч'}${o.movers?' · грузчиков: '+o.movers:''}\n💰 ≈ ${rub(o.total)}${o.floor?'\n🏢 '+esc(o.floor):''}\n👤 ${esc(o.name)}, ${esc(o.phone)}${o.note?'\n💬 '+esc(o.note):''}`;
+const card=o=>`🆕 <b>Заявка №${o.no}</b> · ${esc(o.when)}\n📍 <b>Откуда:</b> ${esc(o.from)}\n🏁 <b>Куда:</b> ${esc(o.to)}\n📦 ${esc(o.what)}${o.inter?' · 🛣 межгород '+o.km+' км':' · ~'+o.hours+' ч'}${o.movers?' · грузчиков: '+o.movers:''}${o.pc&&o.car0?` · 🌙 скидка −${o.pc}%`:''}${o.ins?' · 🛡 страховка':''}\n💰 ≈ ${rub(o.total)}${o.floor?'\n🏢 '+esc(o.floor):''}\n👤 ${esc(o.name)}, ${esc(o.phone)}${o.note?'\n💬 '+esc(o.note):''}`;
 // межгород — без «Нягань,» перед адресом назначения
 const rpt=(c,t,city)=>c?`${c[0]},${c[1]}`:encodeURIComponent((city?'Нягань, ':'')+t);
 const route=o=>`<a href="https://yandex.ru/maps/?rtext=${rpt(o.fromC,o.from,true)}~${rpt(o.toC,o.to,!o.inter)}&rtt=auto" target="_blank" rel="noopener">📍 Маршрут</a><a href="tel:${esc(o.phone.replace(/[^\d+]/g,''))}">📞 Клиенту</a>`;
