@@ -240,7 +240,7 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
       <p class="note">Минимальный заказ по городу — 1 час. Межгород — минимум 3 000 ₽. Дополнительно: страховка груза до 100 000 ₽ — +300 ₽ к заказу. <span class="ex">пример прайса</span></p>
       <div class="pgrid">
         <div class="dcard"><span class="pct">×2</span><b>🌙 Ночной тариф, 22:00–07:00</b><p>Ночью водитель работает вместо сна, поэтому машина в два раза дороже — 3 000 ₽/час. Укажите ночное время подачи — надбавка посчитается в заявке сама.</p></div>
-        <div class="dcard"><span class="pct">−15%</span><b>🕐 Дневной спад, 12:00–15:00</b><p>После обеденных разъездов машины свободны. Подача в это время дешевле, скидка сразу видна в калькуляторе выше.</p></div>
+        <div class="dcard"><span class="pct">🛡</span><b>Страховка груза, +300 ₽</b><p>Покрытие до 100 000 ₽, оформляется вместе с заказом. Частники страховку не дают вообще.</p></div>
       </div>
     </div>
   </section>
@@ -330,8 +330,9 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
 const PRICE=1500, MOVER=1000; // ₽/час: машина и один грузчик — цены владельца
 const KM=40, INTER_MIN=3000;   // межгород: ₽/км в одну сторону (обратная дорога включена) и минимум — пример, уточнить у владельца
 const INS=300;                 // страховка груза, ₽ за заказ — пример, уточнить у владельца
-const NIGHT=[22,7], MIDDAY=[12,15]; // ночная надбавка (22:00–07:00) и дневной «свободный час» (12:00–15:00) — окна сверить с владельцем
-const NIGHT_PCT=100, MIDDAY_PCT=-15; // ночь: машина ×2 (+100%); день: −15%
+const NIGHT=[22,7];      // ночная надбавка (22:00–07:00) — окно сверить с владельцем
+const NIGHT_PCT=100;     // ночь: машина ×2 (+100%)
+const HOLIDAYS=[];       // праздники (в демо нет календаря); в рабочей версии — тумблер «праздник ×2» в админке бота или список дат производственного календаря
 const rub=n=>n.toLocaleString('ru-RU')+' ₽';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const $=id=>document.getElementById(id);
@@ -339,15 +340,14 @@ const pick=id=>$(id).querySelector('.chip.on').dataset.v;
 function est(){const inter=pick('trip')==='inter',h=+$('hours').value,mv=+$('movers').value,km=Math.max(0,+$('km').value||0),ins=pick('ins')==='1'?INS:0;
   const car0=inter?(km?Math.max(INTER_MIN,km*KM):0):h*PRICE,mov=mv*h*MOVER,sur=adjPct(),car=car0?Math.round(car0*(100+sur)/100):0;
   return {inter,h,mv,km,ins,sur,car0,car,mov,total:car+mov+ins}}
-// ночная надбавка ×2 (+100%) и дневной «свободный час» (−15%): «Сейчас» — часы на телефоне клиента, иначе время из поля
+// ночная надбавка ×2 (+100%): «Сейчас» — часы на телефоне клиента, иначе время из поля
 function adjPct(){let hr=null;
   if(pick('when')==='Сейчас')hr=new Date().getHours();
   else{const t=($('time').value||'').replace(/\d{1,2}\.\d{1,2}(\.\d{2,4})?/g,''),m=t.match(/(\d{1,2}):(\d{2})/),c=(t.replace(/\d{1,2}:\d{2}/,'').match(/\d+/g)||[]).map(Number);
     hr=m?+m[1]:(c.find(x=>x<=23)??null)}
   if(hr===null)return 0;
-  const[n1,n2]=NIGHT,[d1,d2]=MIDDAY;
+  const[n1,n2]=NIGHT;
   if(hr>=n1||hr<n2)return NIGHT_PCT;
-  if(hr>=d1&&hr<d2)return MIDDAY_PCT;
   return 0}
 function calc(){const e=est();
   $('hoursLbl').textContent=e.inter?'Погрузка и разгрузка, часов':'Примерно часов';
@@ -355,12 +355,12 @@ function calc(){const e=est();
   $('carLbl').textContent=e.inter?(e.km?`Машина, ${e.km} км × ${KM} ₽`:'Машина: укажите км'):`Машина, ${e.h} ч × ${rub(PRICE)}`;
   $('pCar').textContent=e.car0?rub(e.car0):'—';
   $('movRow').style.display=e.mv?'flex':'none';$('movLbl').textContent=`Грузчики, ${e.mv} × ${e.h} ч × ${rub(MOVER)}`;$('pMov').textContent=rub(e.mov);
-  $('discRow').style.display=e.sur&&e.car0?'flex':'none';
-  $('discLbl').textContent=e.sur>0?'🌙 Ночной тариф, машина ×2':`🕐 Свободный час, −${-e.sur}%`;
-  $('pDisc').textContent=(e.sur>0?'+ ':'− ')+rub(Math.abs(e.car0-e.car));$('pDisc').style.color=e.sur>0?'':'#7ee2a0';
+  $('discRow').style.display=e.sur>0&&e.car0?'flex':'none';
+  $('discLbl').textContent='🌙 Ночной тариф, машина ×2';
+  $('pDisc').textContent='+ '+rub(e.car0-e.car);
   $('insRow').style.display=e.ins?'flex':'none';$('pIns').textContent='+ '+rub(e.ins);
   $('pTotal').textContent=(e.car0||e.mov)?'≈ '+rub(e.total):'—';
-  $('priceNote').innerHTML=e.sur>0?'Ночью (22:00–07:00) действует ночной тариф — машина в два раза дороже. Точную цену водитель подтвердит по телефону.':(e.sur<0?'Дневной свободный час (12:00–15:00) — машина дешевле, скидка уже учтена. Точную цену водитель подтвердит по телефону.':(e.inter?`Межгород: ${KM} ₽/км в одну сторону, обратная дорога уже включена, минимум ${rub(INTER_MIN)} <span class="ex">пример</span>. Точную цену водитель скажет по телефону.`:'Точную цену водитель скажет по телефону.'))}
+  $('priceNote').innerHTML=e.sur>0?'Ночью (22:00–07:00) действует ночной тариф — машина в два раза дороже. Точную цену водитель подтвердит по телефону.':(e.inter?`Межгород: ${KM} ₽/км в одну сторону, обратная дорога уже включена, минимум ${rub(INTER_MIN)} <span class="ex">пример</span>. Точную цену водитель скажет по телефону.`:'Точную цену водитель скажет по телефону.'))}
 document.querySelectorAll('.chips').forEach(g=>g.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;g.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
   if(g.id==='when'){$('timeBox').style.display=c.dataset.v==='Сейчас'?'none':'flex';calc()}
   if(g.id==='trip'||g.id==='ins')calc()}));
@@ -420,7 +420,7 @@ function addMsg(chat,html,kb,sys){const cb=document.querySelector(`#c-${chat} .c
   let k=null;if(kb){k=document.createElement('div');k.className='kb';k.innerHTML=kb;cb.appendChild(k)}cb.scrollTop=cb.scrollHeight;
   const t=document.querySelector(`.ftab[data-ft="${chat}"]`);if(t&&!t.classList.contains('on'))t.classList.add('ping');return m}
 const drop=chat=>document.querySelectorAll(`#c-${chat} .kb`).forEach(k=>k.remove());
-const card=o=>`🆕 <b>Заявка №${o.no}</b> · ${esc(o.when)}\n📍 <b>Откуда:</b> ${esc(o.from)}\n🏁 <b>Куда:</b> ${esc(o.to)}\n📦 ${esc(o.what)}${o.inter?' · 🛣 межгород '+o.km+' км':' · ~'+o.hours+' ч'}${o.movers?' · грузчиков: '+o.movers:''}${o.car0&&o.sur>0?' · 🌙 ночь ×2':o.car0&&o.sur<0?` · 🕐 −${-o.sur}%`:''}${o.ins?' · 🛡 страховка':''}\n💰 ≈ ${rub(o.total)}${o.floor?'\n🏢 '+esc(o.floor):''}\n👤 ${esc(o.name)}, ${esc(o.phone)}${o.note?'\n💬 '+esc(o.note):''}`;
+const card=o=>`🆕 <b>Заявка №${o.no}</b> · ${esc(o.when)}\n📍 <b>Откуда:</b> ${esc(o.from)}\n🏁 <b>Куда:</b> ${esc(o.to)}\n📦 ${esc(o.what)}${o.inter?' · 🛣 межгород '+o.km+' км':' · ~'+o.hours+' ч'}${o.movers?' · грузчиков: '+o.movers:''}${o.car0&&o.sur>0?' · 🌙 ночь ×2':''}${o.ins?' · 🛡 страховка':''}\n💰 ≈ ${rub(o.total)}${o.floor?'\n🏢 '+esc(o.floor):''}\n👤 ${esc(o.name)}, ${esc(o.phone)}${o.note?'\n💬 '+esc(o.note):''}`;
 // межгород — без «Нягань,» перед адресом назначения
 const rpt=(c,t,city)=>c?`${c[0]},${c[1]}`:encodeURIComponent((city?'Нягань, ':'')+t);
 const route=o=>`<a href="https://yandex.ru/maps/?rtext=${rpt(o.fromC,o.from,true)}~${rpt(o.toC,o.to,!o.inter)}&rtt=auto" target="_blank" rel="noopener">📍 Маршрут</a><a href="tel:${esc(o.phone.replace(/[^\d+]/g,''))}">📞 Клиенту</a>`;
