@@ -102,7 +102,28 @@ section{padding:72px 0}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:2px 0 14px}
 .consent input{width:18px;height:18px;flex:none;margin-top:2px;accent-color:var(--y);cursor:pointer}
 .consent a{color:var(--y);text-decoration:underline}
-@media (max-width:900px){.pgrid,.fleet{grid-template-columns:1fr}.px th,.px td{padding:9px 10px;font-size:14px}}
+/* отзывы клиентов */
+.rsum{display:flex;align-items:center;gap:16px}
+.rbig{font:400 56px/1 "Russo One",Impact,sans-serif;color:var(--y)}
+.rbig small{font-size:18px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rcard{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.rcard .top{display:flex;align-items:center;gap:12px}
+.rcard .av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:400 20px "Russo One",Impact,sans-serif;color:#111;flex:none;background:var(--y)}
+.rcard b{display:block;font-size:16px}
+.rcard .dt{color:var(--muted);font-size:13px;font-weight:600}
+.stars i{font-style:normal;color:#ffb400;letter-spacing:2px}
+.stars i.off{color:rgba(255,255,255,.14)}
+.rcard p{color:var(--muted);font-size:15px;flex:1}
+.rform{margin-top:24px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px}
+.rform label{font-weight:800;font-size:14px;color:var(--muted)}
+.rform input,.rform textarea{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;margin-top:6px}
+.rform input:focus,.rform textarea:focus{outline:none;border-color:var(--y)}
+.rstars{display:flex;gap:6px;margin-top:8px}
+.rstars button{background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:20px;padding:6px 12px;color:#6d6d66;cursor:pointer}
+.rstars button.on{color:#ffb400;border-color:#ffb400;background:#241d0d}
+.rok{color:#7ee2a0;font-weight:800;font-size:14px;margin-top:10px;display:none}
+@media (max-width:900px){.pgrid,.fleet,.rgrid{grid-template-columns:1fr}.px th,.px td{padding:9px 10px;font-size:14px}}
 .contacts{background:var(--bg2);border-top:1px solid var(--line)}
 .cbox{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .cc{background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:22px}
@@ -258,6 +279,24 @@ footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
       <div class="fleet">
         <div class="fcar">🚚 <b>Газель-тент · 3 м · 1,5 т · 12 м³</b><small>Переезды, мебель, техника, стройматериалы. <span class="ex">пример парка</span></small></div>
         <div class="fcar">🚛 <b>Газель-борт · 2,5 м · 1 т</b><small>Вывоз мусора, дрова, песок и стройматериал навалом. <span class="ex">пример парка</span></small></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <div class="wrap">
+      <div class="head"><h2>Что говорят <span>клиенты</span></h2><p>Переезды, мусор, межгород — вот что пишут люди, чьи вещи мы уже перевезли.</p></div>
+      <div class="rsum rv2"><span class="rbig"><span id="rAvg">5,0</span><small> / 5</small></span><div><div class="stars" id="rAvgStars"></div><small style="color:var(--muted)" id="rCnt"></small></div></div>
+      <div class="rgrid" id="rgrid" style="margin-top:18px"></div>
+      <div class="rform">
+        <h3 class="ru" style="font-size:22px;margin-bottom:4px">Оставить отзыв</h3>
+        <div style="margin-top:12px"><label>Ваша оценка *</label><div class="rstars" id="rstars"></div></div>
+        <div style="margin-top:12px"><label for="rName">Имя *</label><input id="rName" maxlength="30" placeholder="Как вас зовут"></div>
+        <div style="margin-top:12px"><label for="rText">Отзыв *</label><textarea id="rText" rows="3" maxlength="400" placeholder="Куда возили, как прошло, что понравилось"></textarea></div>
+        <p class="err" id="rErr"></p>
+        <button class="btn" id="rSend" type="button" style="width:100%;margin-top:12px">Опубликовать отзыв</button>
+        <p class="rok" id="rok">Спасибо! Отзыв уже на стене 🚚</p>
+        <p class="note">В рабочей версии отзывы проходят модерацию и видны всем клиентам.</p>
       </div>
     </div>
   </section>
@@ -428,6 +467,44 @@ $('flow').addEventListener('click',e=>{const tab=e.target.closest('.ftab');if(ta
     addMsg('client','🏁 Перевозка выполнена! Спасибо, что выбрали GRUZ expedition 🚚\nОцените нас:',`<button data-a="rate">⭐⭐⭐⭐⭐</button>`)}
   else if(a==='rate'){drop('client');addMsg('client','Спасибо за оценку! ❤️ Сохраните наш номер: +7 922 44-8888-7');addMsg('d1','⭐ Клиент поставил 5 звёзд',null,true)}});
 $('flowClose').addEventListener('click',()=>{});
+// ── стена отзывов клиентов ──
+const gS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const gSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let RVOTE=0;
+const RSEED=[
+ {n:'Ольга',r:5,d:'17.11',t:'Перевозили квартиру с 3 этажа без лифта. Приехали через 20 минут, грузчики за час управились, ничего не поцарапали. Цена как в заявке — ни рублем больше.'},
+ {n:'Марат',r:5,d:'14.11',t:'Вывозили мусор после ремонта, борт влез весь. Подали в 11 вечера, никто не удивился времени. Спасибо!'},
+ {n:'Елена',r:5,d:'11.11',t:'Стройматериалы с базы до частного дома. Водитель сам помог разгрузить. Страховку оформили за пару минут — ехать спокойнее.'},
+ {n:'Дмитрий',r:4,d:'07.11',t:'Межгород Нягань — Ханты-Мансийск. Честно: 40 ₽/км как и написано на сайте, за обратную дорогу не доплачивал. Четыре звезды за ожидание подъёма.'},
+ {n:'Светлана',r:5,d:'02.11',t:'Перевозили холодильник и стиралку. Упаковали в пледы, занесли, поставили на место. Утром позвонили уточнить, всё ли понравилось.'},
+ {n:'Руслан',r:5,d:'28.10',t:'«Компания, а не частник» — не слова, а правда. Договор, страховка, цена до подачи. Больше никого искать не буду, номер сохранён.'}
+];
+const starsHtml=r=>Array.from({length:5},(_,i)=>`<i class="${i<r?'':'off'}">★</i>`).join('');
+const plural=(n,a,b,c)=>n%10===1&&n%100!==11?a:(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c);
+const revs=()=>[...gS('gz_reviews',[]),...RSEED];
+function renderReviews(){
+  const all=revs(),avg=all.length?all.reduce((s,x)=>s+x.r,0)/all.length:5;
+  $('rAvg').textContent=avg.toFixed(1).replace('.',',');
+  $('rAvgStars').innerHTML=starsHtml(Math.round(avg));
+  $('rCnt').textContent=`${all.length} ${plural(all.length,'отзыв','отзыва','отзывов')} клиентов`;
+  $('rgrid').innerHTML=all.map(x=>`
+   <div class="rcard"><div class="top"><span class="av">${esc(x.n[0].toUpperCase())}</span><div><b>${esc(x.n)}</b><span class="dt">${esc(x.d)}</span></div></div>
+   <div class="stars">${starsHtml(x.r)}</div><p>${esc(x.t)}</p></div>`).join('');
+  const u=$('rstars');
+  if(!u.dataset.built){u.dataset.built=1;u.innerHTML=[1,2,3,4,5].map(v=>`<button data-rv="${v}" type="button">★</button>`).join('')}
+}
+$('rstars').addEventListener('click',e=>{const b=e.target.closest('[data-rv]');if(!b)return;RVOTE=+b.dataset.rv;
+  document.querySelectorAll('#rstars button').forEach(x=>x.classList.toggle('on',+x.dataset.rv<=RVOTE))});
+$('rSend').onclick=()=>{const nm=$('rName').value.trim(),tx=$('rText').value.trim();
+  const miss=!nm?'Представьтесь':!tx?'Напишите пару слов':!RVOTE?'Поставьте оценку':'';
+  if(miss){$('rErr').textContent=miss;$('rErr').style.display='block';return}
+  $('rErr').style.display='none';
+  const mine=gS('gz_reviews',[]);
+  mine.unshift({n:nm,r:RVOTE,d:new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'}),t:tx});
+  gSet('gz_reviews',mine);RVOTE=0;$('rName').value='';$('rText').value='';
+  document.querySelectorAll('#rstars button').forEach(x=>x.classList.remove('on'));
+  renderReviews();$('rok').style.display='block'};
+renderReviews();
 </script>
 </body>
 </html>
